@@ -12,9 +12,9 @@ trait Client
 {
     use AuthService;
 
-    public static $client;
-    protected static $appConfig = [];
-    protected $shop_access_token_key = 'imactool.shop.access_token.'; //店铺 token 缓存 key
+    public static    $client;
+    protected static $appConfig             = [];
+    protected        $shop_access_token_key = 'imactool.shop.access_token.'; //店铺 token 缓存 key
 
     public function httpClient()
     {
@@ -60,25 +60,25 @@ trait Client
 
     public function authorizerTokenKey()
     {
-        return $this->shop_access_token_key.self::getShopConfig('shopId');
+        return $this->shop_access_token_key . self::getShopConfig('shopId');
     }
 
     /**
      * 发送 get 请求
      *
      * @param string $endpoint
-     * @param array  $query
-     * @param array  $headers
+     * @param array $query
+     * @param array $headers
      *
      * @return mixed
      */
-    public function get($endpoint, $query = [], $headers = [])
+    public function get($endpoint, $query = [], $headers = [], $isAccessToken = true)
     {
-        $query = $this->generateParams($endpoint, $query);
+        $query = $this->generateParams($endpoint, $query, $isAccessToken);
 
         return $this->httpClient()->request('get', $endpoint, [
             'headers' => $headers,
-            'query' => $query,
+            'query'   => $query,
         ]);
     }
 
@@ -86,17 +86,17 @@ trait Client
      * 发送 post 请求
      *
      * @param string $endpoint
-     * @param array  $params
-     * @param array  $headers
+     * @param array $params
+     * @param array $headers
      *
      * @return mixed
      */
-    public function post($endpoint, $params = [], $headers = [])
+    public function post($endpoint, $params = [], $headers = [], $isAccessToken = true)
     {
-        $params = $this->generateParams($endpoint, $params);
+        $params = $this->generateParams($endpoint, $params, $isAccessToken);
 
         return $this->httpClient()->request('post', $endpoint, [
-            'header' => $headers,
+            'header'      => $headers,
             'form_params' => $params,
         ]);
     }
@@ -110,13 +110,13 @@ trait Client
      *
      * @return mixed
      */
-    public function postJosn($endpoint, $params = [], $headers = [])
+    public function postJosn($endpoint, $params = [], $headers = [], $isAccessToken = true)
     {
-        $params = $this->generateParams($endpoint, $params);
+        $params = $this->generateParams($endpoint, $params, $isAccessToken);
 
         return $this->httpClient()->request('post', $endpoint, [
             'headers' => $headers,
-            'json' => $params,
+            'json'    => $params,
         ]);
     }
 
@@ -125,35 +125,35 @@ trait Client
      *
      * @see https://op.jinritemai.com/docs/guide-docs/10/23
      *
-     * @param string $url    支持 /shop/brandList 或者 shop/brandList 格式
-     * @param array  $params 业务参数
+     * @param string $url 支持 /shop/brandList 或者 shop/brandList 格式
+     * @param array $params 业务参数
      */
-    protected function generateParams(string $url, array $params)
+    protected function generateParams(string $url, array $params, $isAccessToken)
     {
         $method = ltrim(str_replace('/', '.', $url), '.');
-        $accessToken = $this->getAccessToken($this->authorizerTokenKey(), self::getShopConfig('refreshToken'));
-
         //公共参数
         $publicParams = [
-            'method' => $method,
-            'app_key' => self::getAppConfig('app_key'),
-            'access_token' => $accessToken,
-            'timestamp' => date('Y-m-d H:i:s'),
-            'v' => '2',
+            'method'      => $method,
+            'app_key'     => self::getAppConfig('app_key'),
+            'timestamp'   => date('Y-m-d H:i:s'),
+            'v'           => '2',
             'sign_method' => 'md5',
         ];
-
+        if ($isAccessToken) {
+            $accessToken                  = $this->getAccessToken($this->authorizerTokenKey(), self::getShopConfig('refreshToken'));
+            $publicParams['access_token'] = $accessToken;
+        }
         //业务参数
         ksort($params);
-        $params_json = \json_encode((object) $params, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $params_json = \json_encode((object)$params, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        $string = 'app_key'.$publicParams['app_key'].'method'.$method.'param_json'.$params_json.'timestamp'.$publicParams['timestamp'].'v'.$publicParams['v'];
-        $md5Str = self::getAppConfig('app_secret').$string.self::getAppConfig('app_secret');
-        $sign = md5($md5Str);
+        $string = 'app_key' . $publicParams['app_key'] . 'method' . $method . 'param_json' . $params_json . 'timestamp' . $publicParams['timestamp'] . 'v' . $publicParams['v'];
+        $md5Str = self::getAppConfig('app_secret') . $string . self::getAppConfig('app_secret');
+        $sign   = md5($md5Str);
 
         return array_merge($publicParams, [
             'param_json' => $params_json,
-            'sign' => $sign,
+            'sign'       => $sign,
         ]);
     }
 
@@ -170,17 +170,17 @@ trait Client
      */
     public function refreshSelfAccessToken($refresh_token)
     {
-        $params = [
-            'app_id' => self::getAppConfig('app_key'),
-            'app_secret' => self::getAppConfig('app_secret'),
+        $params  = [
+            'app_id'        => self::getAppConfig('app_key'),
+            'app_secret'    => self::getAppConfig('app_secret'),
             'refresh_token' => $refresh_token, //十分钟有效
-            'grant_type' => 'refresh_token',
+            'grant_type'    => 'refresh_token',
         ];
         $options = [
             'headers' => [],
-            'query' => $params,
+            'query'   => $params,
         ];
-        $result = $this->httpClient()->request('get', 'oauth2/refresh_token', $options);
+        $result  = $this->httpClient()->request('get', 'oauth2/refresh_token', $options);
 
         return $result;
     }

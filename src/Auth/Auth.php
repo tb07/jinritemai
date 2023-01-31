@@ -22,13 +22,13 @@ class Auth extends BaseService
      */
     public function generateAuthUrl(string $state)
     {
-        $url = 'https://fuwu.jinritemai.com/authorize';
+        $url   = 'https://fuwu.jinritemai.com/authorize';
         $query = [
             'service' => $this->appRunConfig['service_id'],
-            'state' => $state,
+            'state'   => $state,
         ];
 
-        return $url.'?'.http_build_query($query);
+        return $url . '?' . http_build_query($query);
     }
 
     /**
@@ -40,19 +40,11 @@ class Auth extends BaseService
      */
     public function requestAccessToken($code)
     {
-        $params = [
-            'app_id' => $this->appRunConfig['app_key'],
-            'app_secret' => $this->appRunConfig['app_secret'],
-            'code' => $code,
+        $options = [
+            'code'       => $code,
             'grant_type' => 'authorization_code',
         ];
-
-        $options = [
-            'headers' => [],
-            'query' => $params,
-        ];
-        $result = $this->httpClient()->request('get', 'oauth2/access_token', $options);
-
+        $result  = $this->get('/token/create', $options, false);
         if (0 !== $result['err_no']) {
             return $result;
         }
@@ -73,18 +65,11 @@ class Auth extends BaseService
      */
     public function refreshAccessToken($refresh_token)
     {
-        $params = [
-            'app_id' => $this->appRunConfig['app_key'],
-            'app_secret' => $this->appRunConfig['app_secret'],
-            'refresh_token' => $refresh_token, //十分钟有效
-            'grant_type' => 'refresh_token',
-        ];
         $options = [
-            'headers' => [],
-            'query' => $params,
+            'refresh_token' => $refresh_token,
+            'grant_type'    => 'refresh_token',
         ];
-        $result = $this->httpClient()->request('get', 'oauth2/refresh_token', $options);
-
+        $result  = $this->get('token/refresh', $options);
         if (0 !== $result['err_no']) {
             return $result;
         }
@@ -99,7 +84,7 @@ class Auth extends BaseService
      */
     public function clearShopCache(int $shopId)
     {
-        $key = 'imactool.shop.access_token.'.$shopId;
+        $key = 'imactool.shop.access_token.' . $shopId;
 
         return CacheAdapter::getInstance()->delete($key);
     }
@@ -113,18 +98,18 @@ class Auth extends BaseService
     public function getShopAccessToken($shop_id)
     {
         $params = [
-            'app_id' => $this->appRunConfig['app_key'],
+            'app_id'     => $this->appRunConfig['app_key'],
             'app_secret' => $this->appRunConfig['app_secret'],
-            'code' => '',
+            'code'       => '',
             'grant_type' => 'authorization_self',
-            'shop_id' => $shop_id,
+            'shop_id'    => $shop_id,
         ];
 
         $options = [
             'headers' => [],
-            'query' => $params,
+            'query'   => $params,
         ];
-        $result = $this->httpClient()->request('get', 'oauth2/access_token', $options);
+        $result  = $this->httpClient()->request('get', 'oauth2/access_token', $options);
 
         if (0 !== $result['err_no']) {
             return $result;
