@@ -8,20 +8,44 @@
 
 namespace Imactool\Jinritemai;
 
+use Imactool\Jinritemai\AfterSale\AfterSale;
 use Imactool\Jinritemai\AfterSale\AfterSaleProvider;
+use Imactool\Jinritemai\Auth\Auth;
+use Imactool\Jinritemai\Bill\Bill;
 use Imactool\Jinritemai\Bill\BillProvider;
+use Imactool\Jinritemai\Btas\Btas;
 use Imactool\Jinritemai\Btas\BtasProvider;
+use Imactool\Jinritemai\Comment\Commnet;
 use Imactool\Jinritemai\Comment\CommnetProvider;
 use Imactool\Jinritemai\Core\ContainerBase;
 use Imactool\Jinritemai\Http\Client;
 use Imactool\Jinritemai\Auth\AuthProvider;
+use Imactool\Jinritemai\Insurance\Insurance;
 use Imactool\Jinritemai\Insurance\InsuranceProvider;
+use Imactool\Jinritemai\Logistics\Logistics;
 use Imactool\Jinritemai\Logistics\LogisticsProvider;
+use Imactool\Jinritemai\Order\Order;
 use Imactool\Jinritemai\Order\OrderProvider;
+use Imactool\Jinritemai\Product\Product;
 use Imactool\Jinritemai\Product\ProductProvider;
+use Imactool\Jinritemai\Shop\Shop;
 use Imactool\Jinritemai\Shop\ShopProvider;
+use Imactool\Jinritemai\Stock\Stock;
 use Imactool\Jinritemai\Stock\StockProvider;
 
+/**
+ * @property-read Shop $Shop
+ * @property-read Auth $Auth
+ * @property-read Product $Product
+ * @property-read AfterSale $AfterSale
+ * @property-read Commnet $Commnet
+ * @property-read Insurance $Insurance
+ * @property-read Logistics $Logistics
+ * @property-read Order $Order
+ * @property-read Stock $Stock
+ * @property-read Bill $Bill
+ * @property-read Btas $Btas
+ */
 class DouDianApp extends ContainerBase
 {
     use Client;

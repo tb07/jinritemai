@@ -44,7 +44,7 @@ class Auth extends BaseService
             'code'       => $code,
             'grant_type' => 'authorization_code',
         ];
-        $result  = $this->get('/token/create', $options, false);
+        $result  = $this->get('/token/create', $options, [], false);
         if (0 !== $result['err_no']) {
             return $result;
         }
