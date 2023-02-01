@@ -24,8 +24,8 @@ class Auth extends BaseService
     {
         $url   = 'https://fuwu.jinritemai.com/authorize';
         $query = [
-            'service' => $this->appRunConfig['service_id'],
-            'state'   => $state,
+            'service_id' => $this->appRunConfig['service_id'],
+            'state'      => $state,
         ];
 
         return $url . '?' . http_build_query($query);
