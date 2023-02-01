@@ -40,14 +40,16 @@ class Auth extends BaseService
      */
     public function requestAccessToken($code)
     {
-        $options = [
+        $params  = [
             'code'       => $code,
             'grant_type' => 'authorization_code',
         ];
-        $result  = $this->get('/token/create', $options, [], false);
-        if (0 !== $result['err_no']) {
-            return $result;
-        }
+        $query   = $this->generateParams('token/create', $params, false);
+        $options = [
+            'headers' => [],
+            'query'   => $query,
+        ];
+        $result  = $this->httpClient()->request('get', 'token/create', $options);
 
         return $result;
     }
@@ -65,14 +67,16 @@ class Auth extends BaseService
      */
     public function refreshAccessToken($refresh_token)
     {
-        $options = [
+        $params  = [
             'refresh_token' => $refresh_token,
             'grant_type'    => 'refresh_token',
         ];
-        $result  = $this->get('token/refresh', $options);
-        if (0 !== $result['err_no']) {
-            return $result;
-        }
+        $query   = $this->generateParams('token/refresh', $params, false);
+        $options = [
+            'headers' => [],
+            'query'   => $query,
+        ];
+        $result  = $this->httpClient()->request('get', 'token/refresh', $options);
 
         return $result;
     }

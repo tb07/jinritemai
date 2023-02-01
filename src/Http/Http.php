@@ -13,7 +13,7 @@ use GuzzleHttp\Client;
 class Http
 {
     protected $guzzleOptions = [];
-    protected $baseUri = 'https://openapi-fxg.jinritemai.com/'; //正式环境
+    protected $baseUri       = 'https://openapi-fxg.jinritemai.com/'; //正式环境
 
     protected function getHttpClient()
     {
@@ -24,9 +24,9 @@ class Http
         return new Client($this->guzzleOptions);
     }
 
-    public function request($method, $endpoint, $options = [])
+    public function request($method, $endpoint, $options = [], $returnRaw = false)
     {
-        return $this->unwrapResponse($this->getHttpClient()->{$method}($endpoint, $options));
+        return $this->unwrapResponse($this->getHttpClient()->{$method}($endpoint, $options, $returnRaw));
     }
 
     /**
@@ -34,10 +34,13 @@ class Http
      *
      * @param $response
      */
-    protected function unwrapResponse($response)
+    protected function unwrapResponse($response, $returnRaw)
     {
         $contentType = $response->getHeaderLine('Content-Type');
-        $contents = $response->getBody()->getContents();
+        $contents    = $response->getBody()->getContents();
+        if ($returnRaw) {
+            return $contents;
+        }
         if (false !== stripos($contentType, 'json') || stripos($contentType, 'javascript')) {
             return json_decode($contents, true);
         } elseif (false !== stripos($contentType, 'xml')) {
@@ -57,7 +60,7 @@ class Http
 
     public function setUrl($url)
     {
-        $this->baseUri = trim($url, '/').'/';
+        $this->baseUri = trim($url, '/') . '/';
 
         return $this;
     }

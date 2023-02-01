@@ -72,14 +72,15 @@ trait Client
      *
      * @return mixed
      */
-    public function get($endpoint, $query = [], $headers = [], $isAccessToken = true)
+    public function get($endpoint, $query = [], $headers = [], $returnRaw = false)
     {
-        $query = $this->generateParams($endpoint, $query, $isAccessToken);
+        $query = $this->generateParams($endpoint, $query);
 
         return $this->httpClient()->request('get', $endpoint, [
             'headers' => $headers,
             'query'   => $query,
-        ]);
+        ], $returnRaw
+        );
     }
 
     /**
@@ -91,14 +92,15 @@ trait Client
      *
      * @return mixed
      */
-    public function post($endpoint, $params = [], $headers = [], $isAccessToken = true)
+    public function post($endpoint, $params = [], $headers = [], $returnRaw = false)
     {
-        $params = $this->generateParams($endpoint, $params, $isAccessToken);
+        $params = $this->generateParams($endpoint, $params);
 
         return $this->httpClient()->request('post', $endpoint, [
             'header'      => $headers,
             'form_params' => $params,
-        ]);
+        ], $returnRaw
+        );
     }
 
     /**
@@ -110,14 +112,15 @@ trait Client
      *
      * @return mixed
      */
-    public function postJosn($endpoint, $params = [], $headers = [], $isAccessToken = true)
+    public function postJosn($endpoint, $params = [], $headers = [], $returnRaw = false)
     {
-        $params = $this->generateParams($endpoint, $params, $isAccessToken);
+        $params = $this->generateParams($endpoint, $params);
 
         return $this->httpClient()->request('post', $endpoint, [
             'headers' => $headers,
             'json'    => $params,
-        ]);
+        ], $returnRaw
+        );
     }
 
     /**
@@ -128,7 +131,7 @@ trait Client
      * @param string $url 支持 /shop/brandList 或者 shop/brandList 格式
      * @param array $params 业务参数
      */
-    protected function generateParams(string $url, array $params, $isAccessToken)
+    protected function generateParams(string $url, array $params, $isAccessToken = true)
     {
         $method = ltrim(str_replace('/', '.', $url), '.');
         //公共参数
