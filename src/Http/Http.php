@@ -26,7 +26,7 @@ class Http
 
     public function request($method, $endpoint, $options = [], $returnRaw = false)
     {
-        return $this->unwrapResponse($this->getHttpClient()->{$method}($endpoint, $options, $returnRaw));
+        return $this->unwrapResponse($this->getHttpClient()->{$method}($endpoint, $options),$returnRaw);
     }
 
     /**
