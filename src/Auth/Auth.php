@@ -13,8 +13,6 @@ use Imactool\Jinritemai\Core\CacheAdapter;
 
 class Auth extends BaseService
 {
-    use CacheAdapter;
-
     /**
      * 店铺授权 URL.
      *
@@ -50,7 +48,9 @@ class Auth extends BaseService
             'query'   => $query,
         ];
         $result  = $this->httpClient()->request('get', 'token/create', $options);
+        if (!empty($response['code']) && $response['code'] == 10000 && !empty($response['code']['data']['access_token'])) {
 
+        }
         return $result;
     }
 
@@ -79,18 +79,6 @@ class Auth extends BaseService
         $result  = $this->httpClient()->request('get', 'token/refresh', $options);
 
         return $result;
-    }
-
-    /**
-     * 清除店铺的 token 缓存.
-     *
-     * @param $shopId 授权店铺的id
-     */
-    public function clearShopCache(int $shopId)
-    {
-        $key = 'imactool.shop.access_token.' . $shopId;
-
-        return CacheAdapter::getInstance()->delete($key);
     }
 
     /**

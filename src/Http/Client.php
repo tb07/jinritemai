@@ -10,8 +10,6 @@ namespace Imactool\Jinritemai\Http;
 
 trait Client
 {
-    use AuthService;
-
     public static    $client;
     protected static $appConfig             = [];
     protected        $shop_access_token_key = 'imactool.shop.access_token.'; //店铺 token 缓存 key
@@ -143,8 +141,7 @@ trait Client
             'sign_method' => 'md5',
         ];
         if ($isAccessToken) {
-            $accessToken                  = $this->getAccessToken($this->authorizerTokenKey(), self::getShopConfig('refreshToken'));
-            $publicParams['access_token'] = $accessToken;
+            $publicParams['access_token'] = self::getShopConfig('accessToken');
         }
         //业务参数
         ksort($params);
@@ -158,33 +155,5 @@ trait Client
             'param_json' => $params_json,
             'sign'       => $sign,
         ]);
-    }
-
-    /**
-     * 尝试刷新自己 cache 的 token 刷新 access_token
-     * 如果refresh_token也过期了，则只能让商家点击“使用”按钮，会打开应用使用地址，
-     * 地址参数里会带上新的授权code。然后用新的code，重新调接口，获取新的access_token。
-     *
-     * @see https://op.jinritemai.com/help/faq/43/206
-     *
-     * @param $refresh_token
-     *
-     * @return mixed
-     */
-    public function refreshSelfAccessToken($refresh_token)
-    {
-        $params  = [
-            'app_id'        => self::getAppConfig('app_key'),
-            'app_secret'    => self::getAppConfig('app_secret'),
-            'refresh_token' => $refresh_token, //十分钟有效
-            'grant_type'    => 'refresh_token',
-        ];
-        $options = [
-            'headers' => [],
-            'query'   => $params,
-        ];
-        $result  = $this->httpClient()->request('get', 'oauth2/refresh_token', $options);
-
-        return $result;
     }
 }

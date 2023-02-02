@@ -49,6 +49,7 @@ use Imactool\Jinritemai\Stock\StockProvider;
 class DouDianApp extends ContainerBase
 {
     use Client;
+
     private static $config;
     /**
      * 配置服务提供者.
@@ -76,11 +77,11 @@ class DouDianApp extends ContainerBase
         parent::__construct();
     }
 
-    public function shopApp(int $shopId, string $refreshToken)
+    public function shopApp(int $shopId, string $accessToken)
     {
         parent::__construct();
-        $this->shopId = $shopId;
-        $this->refreshToken = $refreshToken;
+        $this->shopId      = $shopId;
+        $this->accessToken = $accessToken;
 
         return $this;
     }

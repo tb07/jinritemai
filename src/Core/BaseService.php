@@ -23,7 +23,7 @@ class BaseService
         $this->app = $app;
         if (property_exists($app, 'shopId')) {
             $config['shopId'] = $app->shopId;
-            $config['refreshToken'] = $app->refreshToken;
+            $config['accessToken'] = $app->accessToken;
             self::setAppConfig('shop', $config);
         }
         $this->appRunConfig = self::getAppConfig();
